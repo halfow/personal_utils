@@ -27,7 +27,7 @@ def cli():
     #       quiet mode might be more useful -q -qq -qqq
     #       "disable info, disable warning, disable error"
     # TODO: add log to file option
-    def dir_validator(directory: str) -> Path:
+    def dir_validator(directory: str) -> Path | None:
         """Test is dir and return Path object"""
         tmp = Path(directory).resolve()
 
@@ -35,6 +35,7 @@ def cli():
             return tmp
 
         log.error(f"'{tmp!s}' is not a directory")
+        return None
 
     parser = ArgumentParser(
         description=r"""
@@ -101,10 +102,8 @@ def wait(seconds: int):
     if not seconds:
         return
 
-    with Progress() as progress:
-
+    with Progress(transient=True,) as progress:
         task = progress.add_task("[cyan]Sleep ...", total=seconds)
-
         while not progress.finished:
             progress.update(task, advance=1)
             time.sleep(1)
